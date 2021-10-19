@@ -3,6 +3,7 @@ from pathlib import Path
 
 import water_tank
 
+
 app = Flask(__name__)
 
 PLOT_FOLDER = Path("plots")

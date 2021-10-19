@@ -1,7 +1,8 @@
 import math, time, csv, json
 from pathlib import Path
 import matplotlib
-matplotlib.use('Agg')
+
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 PLOT_FOLDER = Path("plots")
@@ -13,53 +14,99 @@ OUTFLOW_COEF = 0.035  # m5/2
 INFLOW_RATE = 0.05  # m3/s
 SAMPLING_PERIOD = 1  # s
 
-SIMULATION_TIME = 60 * 60  # s
+SIMULATION_TIME = 30 * 60  # s
+
+TARGET_LEVEL = 1.5  # m
+
+SIGNAL_AMPLIFICATION = 0.015
+DOUBLING_TIME = 0.5  # s 0.5 to 2
+LEAD_TIME = 0.25  # s
+
+CONTROL_SIGNAL_MAX = 10
 
 
-def simulate_watertank(tank_area, tank_height, outflow_coef, inflow_rate, sampling_period, simulation_time):
+def simulate_watertank(tank_area, tank_height, outflow_coef, max_inflow_rate,
+                       sampling_period,  simulation_time,
+                       signal_amplification, control_signal_max, target_level, doubling_time, lead_time):
     time_elapsed = 0  # s
     current_height = 0  # m
+    difference = 0  # m
+    control_signal = 0
+
     time_samples = [time_elapsed]
     water_heights = [current_height]
+    level_differences = [difference]
+    signals = [control_signal]
 
     while time_elapsed < simulation_time:
+        difference = target_level - current_height
+
+        control_signal = signal_amplification * \
+                         (level_differences[-1]
+                          + (sampling_period / doubling_time) * sum(level_differences)
+                          + (lead_time / sampling_period) * (level_differences[-1] - difference)
+                          )
+
+        control_signal = min(max(control_signal, 0), control_signal_max)
+
+        #  a + (b - a) * t.
+        inflow_rate = max_inflow_rate * (control_signal / control_signal_max)
+
         current_height = (1 / tank_area) * (
                 -outflow_coef * math.sqrt(water_heights[-1]) + inflow_rate) * sampling_period + water_heights[-1]
 
-        current_height = tank_height if current_height >= tank_height else current_height
-        current_height = 0 if current_height <= 0 else current_height
+        current_height = min(max(current_height, 0), tank_height)
 
         time_elapsed += sampling_period
 
         water_heights.append(current_height)
         time_samples.append(time_elapsed)
+        level_differences.append(difference)
+        signals.append(control_signal)
 
-    result = {"water_heights": water_heights, "time_samples": time_samples}
+    result = {"water_heights": water_heights, "time_samples": time_samples, "signals" : signals}
     return result
 
 
-def plot_save_water_levels(data, keep_result, plot_folder, data_folder):
-    if not keep_result:
-        plt.cla()
+def plot_save_water_levels(data, save_plot, plot_folder, data_folder):
+    fig, ax1 = plt.subplots()
 
-    plt.plot(data["time_samples"], data["water_heights"])
-    plt.title("Water level in a tank")
-    plt.ylabel("Water level [m]")
-    plt.xlabel("Time [s]")
-    # plt.show()
 
-    timestamp = round(time.time())
+    color = 'tab:blue'
+    ax1.set_ylabel("Water level [m]", color=color)
+    ax1.set_xlabel("Time [s]")
 
-    plot_filename = f"plot-{timestamp}.png"
-    plt.savefig(plot_folder / plot_filename)
+    ax1.plot(data["time_samples"], data["water_heights"], color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
 
-    data_filename = f"water_levels-{timestamp}.json"
-    with open(data_folder / data_filename, 'w') as fp:
-        json.dump(data, fp)
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
-    return plot_filename
+    color = 'tab:red'
+    ax2.set_ylabel("Signal strength", color=color)
+    ax2.plot(data["time_samples"], data["signals"], color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    fig.tight_layout()  # otherwise the right y-label is slightly clipped
+
+    if save_plot:
+
+        timestamp = round(time.time())
+
+        plot_filename = f"plot-{timestamp}.png"
+        fig.savefig(plot_folder / plot_filename)
+
+        data_filename = f"water_levels-{timestamp}.json"
+        with open(data_folder / data_filename, 'w') as fp:
+            json.dump(data, fp)
+
+        return plot_filename
+    else:
+        plt.show()
 
 
 if __name__ == '__main__':
-    results = simulate_watertank(TANK_AREA, TANK_HEIGHT, OUTFLOW_COEF, INFLOW_RATE, SAMPLING_PERIOD, SIMULATION_TIME)
-    plot_save_water_levels(results, PLOT_FOLDER, DATA_FOLDER)
+    results = simulate_watertank(TANK_AREA, TANK_HEIGHT, OUTFLOW_COEF, INFLOW_RATE,
+                                 SAMPLING_PERIOD, SIMULATION_TIME,
+                                 SIGNAL_AMPLIFICATION, CONTROL_SIGNAL_MAX, TARGET_LEVEL, DOUBLING_TIME, LEAD_TIME)
+
+    plot_save_water_levels(results, False, PLOT_FOLDER, DATA_FOLDER)
