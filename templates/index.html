@@ -3,38 +3,66 @@
 <title>Automatyka - index</title>
 {% endblock %}
 
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/index.css')}}">
+{% endblock %}
+
 {% block main %}
 
+<header>
+    <h1><a href="{{url_for('index')}}">Water tank simulation</a></h1>
+</header>
+<div id="content">
 
-<h1>Water tank simulation</h1>
-<form id="water-tank" name="water-tank-data" action="{{url_for('water_tank_simulation')}}" method="POST">
-    <label for="data-area">Tank area[m2]</label>
-    <input type="range" name="tank-area" id="data-area" oninput="this.nextElementSibling.value = this.value" min="0.1" max="5" step="0.1" value="2"><output>2</output><br>
-
-    <label for="data-height">Tank height[m]</label>
-    <input type="range" name="tank-height" id="data-height" oninput="this.nextElementSibling.value = this.value" min="1" max="50" step="1" value="10"><output>10</output><br>
-
-    <label for="data-outflow-coef">Outflow coefficient [m5/2]</label>
-    <input type="range" name="outflow-coef" id="data-outflow-coef" oninput="this.nextElementSibling.value = this.value" min="0.010" max="0.05" step="0.005" value="0.035"><output>0.035</output><br>
-
-    <label for="data-inflow-rate">Inflow rate[m3/s]</label>
-    <input type="range" name="inflow-rate" id="data-inflow-rate" oninput="this.nextElementSibling.value = this.value" min="0.01"  max="0.1" step="0.005" value="0.05"><output>0.05</output><br>
-
-    <label for="data-sampling-period">Sampling period[s]</label>
-    <input type="range" name="sampling-period" id="data-sampling-period" oninput="this.nextElementSibling.value = this.value" min="0.1" max="10" step="0.1" value="1"><output>1</output><br>
+<div id="data">
+    {% if plot_name %}
+    <h2>Variables</h2>
+    <ul>
+        <li>Target level:<b>{{target_level}}[m]</b> </li>
+        <li>Simulation time: <b>{{simulation_time}}[s]</b> </li>
+    </ul>
+    {% endif %}
+    <h2>Constant values</h2>
+    <ul>
+        <li>Tank area = <b>2[m2]</b></li>
+        <li>Tank height = <b>10[m]</b></li>
+        <li>Outflow coefficient = <b>0.035[m5/2]</b></li>
+        <li>Max inflow rate = <b>0.05[m3/s]</b></li>
+        <li>Sampling period = <b>1[s]</b></li>
+        <li>Signal amplification = <b>0.015</b></li>
+        <li>Doubling time = <b>0.5[s]</b></li>
+        <li>Lead time = <b>0.25[s]</b></li>
+        <li>Control singal max = <b>10</b></li>
+    </ul>
+</div>
+<form id="water-tank" name="water-tank-data" action="{{url_for('water_tank_simulation')}}" method="GET">
+    <label for="target-level">Target Level[m]</label>
+    <input type="range" name="target-level" id="target-level" oninput="this.nextElementSibling.value = this.value" min="0.1" max="2" step="0.1" value="1.5"><output>1.5</output><br>
 
     <label for="data-simulation-time">Simulation time[s]</label>
-    <input type="range" name="simulation-time" id="data-simulation-time" oninput="this.nextElementSibling.value = this.value" min="60" max="7200" step="10" value="3600"><output>3600</output><br>
-
-    <label for="keep-result">Keep previous result</label>
-    <input type="checkbox" id="keep-result" name="keep-result"><br>
+    <input type="range" name="simulation-time" id="data-simulation-time" oninput="this.nextElementSibling.value = this.value" min="60" max="3600" step="10" value="1800"><output>1800</output><br>
 
     <button>Simulate</button>
 </form>
 
-{% if plot_filename %}
-<img src="{{url_for('show_plot', filename=plot_filename)}}">
+{% if plot_name %}
+<div id="plot">
+    <img src="{{url_for('show_plot', filename=plot_name)}}">
+</div>
+
+<div id="quality">
+    <h2>Quality indicators</h2>
+    <ul>
+        <li>Final error: <b>{{quality_indicators["final_error"]}}[m]</b></li>
+        <li>Overshoot: <b>{{quality_indicators["overshoot"]}}[%]</b></li>
+        <li>Regulation time: <b>{{quality_indicators["regulation_time"]}}[s]</b> </li>
+        <li>Integral Regulation Accuracy Indicator (I|e|): <b>{{quality_indicators["Ie"]}}</b></li>
+        <li>Integral Regulation Accuracy Indicator (Ie^2): <b>{{quality_indicators["Ie2"]}}</b></li>
+        <li>Integral regulatory cost indicator (I|u|): <b>{{quality_indicators["Iu"]}}</b></li>
+        <li>Integral regulatory cost indicator (Iu^2): <b>{{quality_indicators["Iu2"]}}</b></li>
+    </ul>
+</div>
 {% endif %}
 
-
+</div>
 {% endblock %}
