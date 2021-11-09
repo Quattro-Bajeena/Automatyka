@@ -2,7 +2,7 @@ import math, time, csv, json
 from pathlib import Path
 import matplotlib
 
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 PLOT_FOLDER = Path("plots")
@@ -18,9 +18,9 @@ SIMULATION_TIME = 30 * 60  # s
 
 TARGET_LEVEL = 1.5  # m
 
-SIGNAL_AMPLIFICATION = 0.015
-DOUBLING_TIME = 0.5  # s 0.5 to 2
-LEAD_TIME = 0.25  # s
+SIGNAL_AMPLIFICATION = 0.015  # regulates the proportional part
+DOUBLING_TIME = 0.5  # s 0.5 to 2; regulates integral part
+LEAD_TIME = 0.25 * 1000  # s ; regulates differential part
 
 CONTROL_SIGNAL_MAX = 10
 
@@ -41,11 +41,12 @@ def simulate_watertank(tank_area, tank_height, outflow_coef, max_inflow_rate,
     while time_elapsed < simulation_time:
         difference = target_level - current_height
 
-        control_signal = signal_amplification * \
-                         (level_differences[-1]
-                          + (sampling_period / doubling_time) * sum(level_differences)
-                          + (lead_time / sampling_period) * (level_differences[-1] - difference)
-                          )
+        proportional_part = level_differences[-1]  # proporcjonalna
+        integral_part = (sampling_period / doubling_time) * sum(level_differences)  # calkowanie
+        differential_part = (lead_time / sampling_period) * (level_differences[-1] - difference)  # rozniczkowanie
+        #print(proportional_part, integral_part, differential_part)
+
+        control_signal = signal_amplification * (proportional_part + integral_part + differential_part)
 
         control_signal = min(max(control_signal, 0), control_signal_max)
 
@@ -84,7 +85,7 @@ def simulate_watertank(tank_area, tank_height, outflow_coef, max_inflow_rate,
     integral_regulatory_cost_indicator_2 = sampling_period * sum([x * x for x in signals])
 
     result = {
-        "target_level" : target_level,
+        "target_level": target_level,
         "water_heights": water_heights,
         "time_samples": time_samples,
         "signals": signals,
@@ -114,12 +115,11 @@ def plot_save_water_levels(data, save_plot, plot_folder, data_folder):
     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
     color = 'tab:red'
-    ax2.set_ylabel("Signal strength", color=color)
+    ax2.set_ylabel("Signal", color=color)
     ax2.plot(data["time_samples"], data["signals"], color=color)
     ax2.tick_params(axis='y', labelcolor=color)
 
     ax1.axhline(y=data["target_level"], color='y', linestyle='--')
-
 
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
 

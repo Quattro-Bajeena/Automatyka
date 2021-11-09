@@ -44,13 +44,17 @@ def show_water_tank_data(filename):
 def water_tank_simulation():
     target_level = float(request.args.get('target-level'))
     simulation_time = int(request.args.get('simulation-time'))
-    #target_level = float(request.form['target-level'])
-    #simulation_time = int(request.form['simulation-time'])
+
+    signal_amplification = float(request.args.get('signal-amplification'))
+    doubling_time = float(request.args.get('doubling-time'))
+    lead_time = float(request.args.get('lead-time'))
+
+    print(signal_amplification, doubling_time, lead_time)
 
     result = water_tank.simulate_watertank(TANK_AREA, TANK_HEIGHT, OUTFLOW_COEF, INFLOW_RATE,
                                            SAMPLING_PERIOD, simulation_time,
-                                           SIGNAL_AMPLIFICATION, CONTROL_SIGNAL_MAX, target_level, DOUBLING_TIME,
-                                           LEAD_TIME)
+                                           signal_amplification, CONTROL_SIGNAL_MAX, target_level, doubling_time,
+                                           lead_time)
 
     plot_name = water_tank.plot_save_water_levels(result, True, PLOT_FOLDER, DATA_FOLDER)
 
@@ -58,7 +62,10 @@ def water_tank_simulation():
                            plot_name=plot_name,
                            quality_indicators=result["quality_indicators"],
                            target_level=target_level,
-                           simulation_time=simulation_time)
+                           simulation_time=simulation_time,
+                           signal_amplification=signal_amplification,
+                           doubling_time=doubling_time,
+                           lead_time=lead_time)
 
 
 if __name__ == '__main__':
