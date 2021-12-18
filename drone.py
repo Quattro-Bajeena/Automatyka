@@ -15,7 +15,7 @@ CONTROL_SIGNAL_MAX = 100
 MAX_ENGINE_FORCE = 40  # N
 MAX_FLIGHT_ALTITUDE = 1000  # m
 
-TARGET_ALTITUDE = 10  # m
+# TARGET_ALTITUDE = 10  # m
 
 SAMPLING_PERIOD = 0.01  # s
 SIMULATION_TIME = 1 * 30  # s
@@ -24,10 +24,16 @@ SIGNAL_AMPLIFICATION = 10  # regulates the proportional part
 DOUBLING_TIME = 10  # s regulates integral part
 LEAD_TIME = 1  # s  regulates differential part
 
+TARGET_ALTITUDES = [(0, 10), (5, 20), (10, 15), (15, 5)]
+
 
 def simulate_drone(max_engine_force, gravity, max_flight_altitude, drone_mass,
                    sampling_period, simulation_time,
-                   signal_amplification, control_signal_max, target_altitude, doubling_time, lead_time):
+                   signal_amplification, control_signal_max, target_altitudes, doubling_time, lead_time):
+    target_altitudes_orig = target_altitudes.copy()
+    target_altitude = target_altitudes[0][1]
+    target_altitudes.pop(0)
+
     time_elapsed = 0  # s
     current_altitude = 0  # m
     current_velocity = 0
@@ -45,6 +51,10 @@ def simulate_drone(max_engine_force, gravity, max_flight_altitude, drone_mass,
     accelerations = [current_acceleration]
 
     while time_elapsed < simulation_time:
+        if len(target_altitudes) > 0 and time_elapsed > target_altitudes[0][0]:
+            target_altitude = target_altitudes[0][1]
+            target_altitudes.pop(0)
+
         # PID CONTROLLER
         difference = target_altitude - current_altitude
 
@@ -82,6 +92,7 @@ def simulate_drone(max_engine_force, gravity, max_flight_altitude, drone_mass,
         accelerations.append(current_acceleration)
 
     # QUALITY INDICATORS
+    # because the target altitude changes those are not really reflacting reality
     final_error = target_altitude - current_altitude
     overshoot = ((max(altitudes) - target_altitude) / target_altitude) * 100  # %
 
@@ -102,12 +113,13 @@ def simulate_drone(max_engine_force, gravity, max_flight_altitude, drone_mass,
     integral_regulatory_cost_indicator_2 = sampling_period * sum([x * x for x in signals])
 
     result = {
-        "target_altitude": target_altitude,
+        "target_altitudes": target_altitudes_orig,
         "altitudes": altitudes,
         "time_samples": time_samples,
         "signals": signals,
         "velocities": velocities,
         "accelerations": accelerations,
+        "simulation_time": simulation_time,
         "quality_indicators": {
             "final_error": round(final_error, 5),
             "overshoot": round(overshoot, 1),
@@ -128,7 +140,6 @@ def plot_save_water_levels(data, save_plot, plot_folder, data_folder):
     ax1.set_ylabel("Altitude [m]", color=color)
     ax1.set_xlabel("Time [s]")
 
-
     ax1.plot(data["time_samples"], data["altitudes"], color=color)
     ax1.tick_params(axis='y', labelcolor=color)
     ax1.set_ylim(bottom=0)
@@ -140,7 +151,15 @@ def plot_save_water_levels(data, save_plot, plot_folder, data_folder):
     ax2.plot(data["time_samples"], data["signals"], color=color)
     ax2.tick_params(axis='y', labelcolor=color)
 
-    ax1.axhline(y=data["target_altitude"], color='y', linestyle='--')
+    for (alt_time, altitude), (next_alt_time, next_altitude) in zip(data["target_altitudes"],
+                                                                    data["target_altitudes"][1:]):
+        begin = alt_time / data["simulation_time"]
+        end = next_alt_time / data["simulation_time"]
+        ax1.axhline(y=altitude, xmin=begin, xmax=end, color='y', linestyle='--')
+
+    alt_time = data["target_altitudes"][-1][0]
+    begin = alt_time / data["simulation_time"]
+    ax1.axhline(y=data["target_altitudes"][-1][1], xmin=begin, xmax=1, color='y', linestyle='--')
 
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     color = 'tab:green'
@@ -177,6 +196,6 @@ def plot_save_water_levels(data, save_plot, plot_folder, data_folder):
 if __name__ == '__main__':
     results = simulate_drone(MAX_ENGINE_FORCE, GRAVITY, MAX_FLIGHT_ALTITUDE, DRONE_MASS,
                              SAMPLING_PERIOD, SIMULATION_TIME,
-                             SIGNAL_AMPLIFICATION, CONTROL_SIGNAL_MAX, TARGET_ALTITUDE, DOUBLING_TIME, LEAD_TIME)
+                             SIGNAL_AMPLIFICATION, CONTROL_SIGNAL_MAX, TARGET_ALTITUDES, DOUBLING_TIME, LEAD_TIME)
 
     plot_save_water_levels(results, False, PLOT_FOLDER, DATA_FOLDER)
