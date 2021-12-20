@@ -2,7 +2,7 @@ import math, time, csv, json
 from pathlib import Path
 import matplotlib
 
-# matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 PLOT_FOLDER = Path("plots")
@@ -136,30 +136,31 @@ def simulate_drone(max_engine_force, gravity, max_flight_altitude, drone_mass,
 def plot_save_water_levels(data, save_plot, plot_folder, data_folder):
     fig, (ax1, ax2_1) = plt.subplots(2, 1, sharex=True)
 
-    color = 'tab:blue'
-    ax1.set_ylabel("Altitude [m]", color=color)
+    color = 'tab:red'
+    ax1.set_ylabel("Signal", color=color)
     ax1.set_xlabel("Time [s]")
 
-    ax1.plot(data["time_samples"], data["altitudes"], color=color)
+    ax1.plot(data["time_samples"], data["signals"], color=color)
     ax1.tick_params(axis='y', labelcolor=color)
-    ax1.set_ylim(bottom=0)
+
 
     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
-    color = 'tab:red'
-    ax2.set_ylabel("Signal", color=color)
-    ax2.plot(data["time_samples"], data["signals"], color=color)
+    color = 'tab:blue'
+    ax2.set_ylabel("Altitude [m]", color=color)
+    ax2.plot(data["time_samples"], data["altitudes"], color=color)
     ax2.tick_params(axis='y', labelcolor=color)
+    ax2.set_ylim(bottom=0)
 
     for (alt_time, altitude), (next_alt_time, next_altitude) in zip(data["target_altitudes"],
                                                                     data["target_altitudes"][1:]):
         begin = alt_time / data["simulation_time"]
         end = next_alt_time / data["simulation_time"]
-        ax1.axhline(y=altitude, xmin=begin, xmax=end, color='y', linestyle='--')
+        ax2.axhline(y=altitude, xmin=begin, xmax=end, color='y', linestyle='--')
 
     alt_time = data["target_altitudes"][-1][0]
     begin = alt_time / data["simulation_time"]
-    ax1.axhline(y=data["target_altitudes"][-1][1], xmin=begin, xmax=1, color='y', linestyle='--')
+    ax2.axhline(y=data["target_altitudes"][-1][1], xmin=begin, xmax=1, color='y', linestyle='--')
 
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     color = 'tab:green'

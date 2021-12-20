@@ -35,7 +35,7 @@
         <li>Control singal max = <b>10</b></li>
     </ul>
 </div>
-<form id="water-tank" name="water-tank-data" action="{{url_for('water_tank_simulation')}}" method="GET">
+<div id="water-tank" name="water-tank-data">
 
     <label for="data-simulation-time">Simulation time[s]</label>
     <input type="range" name="simulation-time" id="data-simulation-time" min="10" max="120" step="10" value="30"><output></output><br>
@@ -49,17 +49,16 @@
     <label for="data-lead-time">Lead time[s]</label>
     <input type="range" name="lead-time" id="data-lead-time" min="0.5" max="5" step="0.5" value="1"><output></output><br>
 
-    <button>Simulate</button>
-</form>
+    <ul id="altitudes" style="list-style: none; padding: 0; margin-bottom: 0;">
+        <li><input class="time" type="text" value="0"><input class="altitude" type="text" value="10"></li>
+        <li><input class="time" type="text" placeholder="time"><input class="altitude" type="text" placeholder="altitude"></li>
+        
+    </ul>
+    <button id="add-altitude" style="margin-bottom: 20px;">➕</button>    
 
-<script>
-    document.querySelectorAll("input").forEach(inputElem => {
-        inputElem.addEventListener('input', event => {
-            event.target.nextElementSibling.value = event.target.value;
-        });
-        inputElem.nextElementSibling.value = inputElem.value;
-    }) 
-</script>
+    <br>
+    <button id="simulate">Simulate</button>
+</div>
 
 {% if plot_name %}
 <div id="plot">
@@ -79,6 +78,8 @@
     </ul>
 </div>
 {% endif %}
+
+<script src="{{url_for('static', filename='javascript/main.js')}}"></script>
 
 </div>
 {% endblock %}

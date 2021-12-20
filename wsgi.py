@@ -44,16 +44,19 @@ def show_water_tank_data(filename):
     return send_from_directory(DATA_FOLDER, filename)
 
 
-@app.route("/drone")
+@app.route("/drone", methods=['POST'])
 def water_tank_simulation():
-    target_altitudes = [(0, 10), (5, 20), (10, 15), (15, 5)]
-    simulation_time = int(request.args.get('simulation-time'))
+    print(request.json)
 
-    signal_amplification = float(request.args.get('signal-amplification'))
-    doubling_time = float(request.args.get('doubling-time'))
-    lead_time = float(request.args.get('lead-time'))
+    target_altitudes =[(float(time), float(alt)) for time, alt in request.json.get('altitudes')]
+    print(target_altitudes)
+    simulation_time = int(request.json.get('simulation-time'))
 
-    print(signal_amplification, doubling_time, lead_time)
+    signal_amplification = float(request.json.get('signal-amplification'))
+    doubling_time = float(request.json.get('doubling-time'))
+    lead_time = float(request.json.get('lead-time'))
+
+    #print(signal_amplification, doubling_time, lead_time)
 
     results = drone.simulate_drone(MAX_ENGINE_FORCE, GRAVITY, MAX_FLIGHT_ALTITUDE, DRONE_MASS,
                                    SAMPLING_PERIOD, simulation_time,
