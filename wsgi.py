@@ -44,12 +44,14 @@ def show_water_tank_data(filename):
     return send_from_directory(DATA_FOLDER, filename)
 
 
-@app.route("/drone", methods=['POST'])
+@app.route("/drone", methods=['GET', 'POST'])
 def water_tank_simulation():
-    print(request.json)
+    if request.method == 'GET':
+        return 'HELLO WORDL'
+    #print(request.json)
 
     target_altitudes =[(float(time), float(alt)) for time, alt in request.json.get('altitudes')]
-    print(target_altitudes)
+    #print(target_altitudes)
     simulation_time = int(request.json.get('simulation-time'))
 
     signal_amplification = float(request.json.get('signal-amplification'))
