@@ -47,7 +47,7 @@ function Simulate(event){
     
 
 
-    const url = '/drone';
+    const url = window.location + 'drone';
     const xhr = new XMLHttpRequest();
     xhr.open("POST", url);
 
@@ -56,15 +56,15 @@ function Simulate(event){
 
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
-        console.log(xhr.status);
-        console.log(xhr.responseText);
+        //console.log(xhr.status);
+        //console.log(xhr.responseText);
         document.body.parentElement.innerHTML = xhr.responseText;
         Initialize();
         
         
     }};
 
-    console.log(data);
+    //console.log(data);
     xhr.send(JSON.stringify(data));
 }
 
