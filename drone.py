@@ -2,7 +2,11 @@ import math, time, csv, json
 from pathlib import Path
 import matplotlib
 
+# comment line below when only running this file.
+# but when its used on the website it has to be there
 matplotlib.use('Agg')
+
+
 import matplotlib.pyplot as plt
 
 PLOT_FOLDER = Path("plots")
