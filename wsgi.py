@@ -19,7 +19,7 @@ MAX_FLIGHT_ALTITUDE = 1000  # m
 
 # TARGET_ALTITUDE = 10  # m
 
-SAMPLING_PERIOD = 0.01  # s
+SAMPLING_PERIOD = 0.1  # s
 SIMULATION_TIME = 1 * 30  # s
 
 SIGNAL_AMPLIFICATION = 10  # regulates the proportional part
