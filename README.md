@@ -1,3 +1,4 @@
-wzmocnienie rgulatora = 0.015
-czas i = 0.5 do 2
-czas wyprzedzenia = 0.25
+# Drone controller
+Projekt na przedmiot Podstawy Automatyki. 
+Kontroler PID utrzymujący drona na zadanej wysokości, oraz strona internetowa na której można przeprowadzić jego symulację,
+zmienijąc przy tym parametry kontrolera.
