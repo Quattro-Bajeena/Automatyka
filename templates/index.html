@@ -10,15 +10,22 @@
 {% block main %}
 
 <header>
-    <h1><a href="{{url_for('index')}}">Drone altitude control</a></h1>
+    <h1><a href="{{url_for('index')}}">DRONE ALTITUDE CONTROL</a></h1>
 </header>
 <div id="content">
 
-<div id="data">
+<div id="data" class="panel">
     {% if plot_name %}
     <h2>Variables</h2>
     <ul>
-        <li>Target level:<b>{{target_altitudes}}[m]</b> </li>
+        <li>
+            Target level:
+            <ol>
+                {% for time, alt in target_altitudes %}
+                    <li><b>{{time}}[s]</b>-<b>{{alt}}[m]</b></li>
+                {% endfor %}
+            </ol>
+        </li>
         <li>Simulation time: <b>{{simulation_time}}[s]</b> </li>
         <li>Signal amplification = <b>{{signal_amplification}}</b></li>
         <li>Doubling time = <b>{{doubling_time}}[s]</b></li>
@@ -34,7 +41,7 @@
         <li>Control singal max = <b>100</b></li>
     </ul>
 </div>
-<div id="water-tank" name="water-tank-data">
+<div id="drone-simulation" class="panel">
 
     <label for="data-simulation-time">Simulation time[s]</label>
     <input type="range" name="simulation-time" id="data-simulation-time" min="10" max="120" step="10" value="30"><output></output><br>
@@ -60,11 +67,11 @@
 </div>
 
 {% if plot_name %}
-<div id="plot">
+<div id="plot" class="panel">
     <img src="{{url_for('show_plot', filename=plot_name)}}">
 </div>
 
-<div id="quality">
+<div id="quality" class="panel">
     <h2>Quality indicators</h2>
     <ul>
 <!--        <li>Final error: <b>{{quality_indicators["final_error"]}}[m]</b></li>-->

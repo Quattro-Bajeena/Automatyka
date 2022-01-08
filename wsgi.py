@@ -63,7 +63,7 @@ def water_tank_simulation():
                                    signal_amplification, CONTROL_SIGNAL_MAX, target_altitudes, doubling_time, lead_time)
 
     plot_name = drone.plot_save_water_levels(results, True, PLOT_FOLDER, DATA_FOLDER)
-
+    print(target_altitudes)
     return render_template('index.html',
                            plot_name=plot_name,
                            quality_indicators=results["quality_indicators"],

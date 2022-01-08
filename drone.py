@@ -33,8 +33,8 @@ TARGET_ALTITUDES = [(0, 10), (5, 20), (10, 15), (15, 5)]
 
 def simulate_drone(max_engine_force, gravity, max_flight_altitude, drone_mass,
                    sampling_period, simulation_time,
-                   signal_amplification, control_signal_max, target_altitudes, doubling_time, lead_time):
-    target_altitudes_orig = target_altitudes.copy()
+                   signal_amplification, control_signal_max, target_altitudes_orig, doubling_time, lead_time):
+    target_altitudes = target_altitudes_orig.copy()
     target_altitude = target_altitudes[0][1]
     target_altitudes.pop(0)
 

@@ -21,7 +21,7 @@ function AddAltitudeInput(event){
 }
 
 function Simulate(event){
-    const inputs = document.getElementById('water-tank').querySelectorAll('input');
+    const inputs = document.getElementById('drone-simulation').querySelectorAll('input');
 
     const normal_inputs = Array.from(inputs).filter(input => input.classList.contains('time') == false && input.classList.contains('altitude') == false);
     const altitude_inputs = Array.from(inputs).filter(input => input.classList.contains('time') || input.classList.contains('altitude'));
