@@ -28,8 +28,8 @@
         </li>
         <li>Simulation time: <b>{{simulation_time}}[s]</b> </li>
         <li>Signal amplification = <b>{{signal_amplification}}</b></li>
-        <li>Doubling time = <b>{{doubling_time}}[s]</b></li>
-        <li>Lead time = <b>{{lead_time}}[s]</b></li>
+        <li>Integral time = <b>{{doubling_time}}[s]</b></li>
+        <li>Derivative time = <b>{{lead_time}}[s]</b></li>
     </ul>
     {% endif %}
     <h2>Constant values</h2>
@@ -49,12 +49,12 @@
     <label for="data-sginal-amplification">Signal amplification</label>
     <input type="range" name="signal-amplification" id="data-sginal-amplification" min="1" max="30" step="1" value="10"><output></output><br>
 
-    <label for="data-doubling-time">Doubling time[s]</label>
+    <label for="data-doubling-time">Integral time[s]</label>
     <input type="range" name="doubling-time" id="data-doubling-time" min="0.5" max="20" step="0.5" value="10"><output></output><br>
 
-    <label for="data-lead-time">Lead time[s]</label>
-    <input type="range" name="lead-time" id="data-lead-time" min="0.5" max="5" step="0.5" value="1"><output></output><br>
-
+    <label for="data-lead-time">Derivative time[s]</label>
+    <input type="range" name="lead-time" id="data-lead-time" min="0.5" max="5" step="0.5" value="1"><output></output><br><br>
+    <b>Target altitudes</b><br>
     <ul id="altitudes" style="list-style: none; padding: 0; margin-bottom: 0;">
         <li><input class="time" type="text" value="0"><input class="altitude" type="text" value="10"></li>
         <li><input class="time" type="text" placeholder="time"><input class="altitude" type="text" placeholder="altitude"></li>

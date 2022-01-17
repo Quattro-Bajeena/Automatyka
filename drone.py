@@ -4,7 +4,7 @@ import matplotlib
 
 # comment line below when only running this file.
 # but when its used on the website it has to be there
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 
 
 import matplotlib.pyplot as plt
@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 PLOT_FOLDER = Path("plots")
 DATA_FOLDER = Path("data")
 
+# DRONE
 GRAVITY = 10  # m/s^2
 DRONE_MASS = 1  # kg
 
@@ -22,13 +23,13 @@ MAX_FLIGHT_ALTITUDE = 1000  # m
 # TARGET_ALTITUDE = 10  # m
 
 SAMPLING_PERIOD = 0.01  # s
-SIMULATION_TIME = 1 * 30  # s
+SIMULATION_TIME = 1 * 25  # s
 
 SIGNAL_AMPLIFICATION = 10  # regulates the proportional part
 DOUBLING_TIME = 10  # s regulates integral part
 LEAD_TIME = 1  # s  regulates differential part
 
-TARGET_ALTITUDES = [(0, 10), (5, 20), (10, 15), (15, 5)]
+TARGET_ALTITUDES = [(0, 10), (5, 20), (10, 30), (15, 15)]
 
 
 def simulate_drone(max_engine_force, gravity, max_flight_altitude, drone_mass,
@@ -141,7 +142,7 @@ def plot_save_water_levels(data, save_plot, plot_folder, data_folder):
     fig, (ax1, ax2_1) = plt.subplots(2, 1, sharex=True)
 
     color = 'tab:red'
-    ax1.set_ylabel("Signal", color=color)
+    ax1.set_ylabel("Control signal", color=color)
     ax1.set_xlabel("Time [s]")
 
     ax1.plot(data["time_samples"], data["signals"], color=color)
